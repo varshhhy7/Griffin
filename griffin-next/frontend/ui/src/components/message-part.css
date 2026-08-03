@@ -8,11 +8,11 @@
 }
 
 [data-component="user-message"] {
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-base);
+  font-family: var(--font-prose, var(--font-family-serif));
+  font-size: var(--text-prose, 15px);
   font-style: normal;
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-large);
+  line-height: 1.6;
   letter-spacing: var(--letter-spacing-normal);
   color: var(--text-base);
   display: flex;

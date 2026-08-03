@@ -34,6 +34,7 @@ import { PrCommand } from "./cli/cmd/pr"
 import { SessionCommand } from "./cli/cmd/session"
 import { LoginCommand, LogoutCommand, StatusCommand, SyncCommand, DevicesCommand } from "./cli/cmd/connect"
 import { ProjectCommand } from "./cli/cmd/project"
+import { DbCommand } from "./cli/cmd/db"
 import { WalletCommand } from "./cli/cmd/billing"
 import { KeysCommand, ConnectCommand, DisconnectCommand } from "./cli/cmd/auth"
 import { LocalCommand } from "./cli/cmd/local"
@@ -141,6 +142,7 @@ const cli = yargs(hideBin(process.argv))
   .command(WalletCommand)
   .command(DoctorCommand)
   .command(ProjectCommand)
+  .command(DbCommand)
   .command(ConnectCommand)
   .command(DisconnectCommand)
   .fail((msg, err) => {

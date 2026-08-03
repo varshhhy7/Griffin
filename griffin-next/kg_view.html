@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Griffin Knowledge Graph</title>
+  <script src="https://unpkg.com/3d-force-graph"></script>
+  <style>
+    body { margin: 0; background: #0b0f19; color: #fff; font-family: system-ui, sans-serif; overflow: hidden; }
+    #info { position: absolute; top: 16px; left: 16px; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); padding: 14px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); z-index: 10; }
+    h1 { margin: 0 0 4px 0; font-size: 16px; }
+    p { margin: 0; font-size: 12px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <h1>Griffin Knowledge Graph</h1>
+    <p>Nodes: 13 | Edges: 1 | Drag, scroll to zoom, click to inspect</p>
+  </div>
+  <div id="3d-graph"></div>
+  <script>
+    const data = {"nodes":[{"id":"src:pubmed:30224644","name":"Mutational processes shape the landscape of TP53 mutations in human cancer.","group":"source"},{"id":"src:pubmed:39450536","name":"TP53 mutations in cancer: Molecular features and therapeutic opportunities (Review).","group":"source"},{"id":"src:pubmed:21331359","name":"TP53 mutations in nonsmall cell lung cancer.","group":"source"},{"id":"src:pubmed:39774325","name":"Deep CRISPR mutagenesis characterizes the functional diversity of TP53 mutations.","group":"source"},{"id":"src:pubmed:31395785","name":"A dominant-negative effect drives selection of TP53 missense mutations in myeloid malignancies.","group":"source"},{"id":"src:pubmed:29979965","name":"A Systematic p53 Mutation Library Links Differential Functional Impact to Cancer Mutation Pattern and Evolutionary Conservation.","group":"source"},{"id":"src:pubmed:36766853","name":"The Role of TP53 in Adaptation and Evolution.","group":"source"},{"id":"src:pubmed:27815305","name":"TP53 Mutations in Breast and Ovarian Cancer.","group":"source"},{"id":"src:pubmed:24665023","name":"TP53 mutations in human cancer: database reassessment and prospects for the next decade.","group":"source"},{"id":"src:pubmed:29039119","name":"Clinical implications of germline mutations in breast cancer: TP53.","group":"source"},{"id":"ent:uniprot:P04637","name":"Cellular tumor antigen p53","group":"entity"},{"id":"ent:hgnc:7157","name":"TP53","group":"entity"},{"id":"clm:46ff95a1211b23a8","name":"TP53 mutations occur in over 50% of human cancers","group":"claim"}],"links":[{"source":"clm:46ff95a1211b23a8","target":"ent:hgnc:7157","label":"derived-from"}]};
+    const colors = { entity: '#3b82f6', source: '#10b981', session: '#8b5cf6', artifact: '#f59e0b', run: '#ec4899', claim: '#f43f5e', project: '#6366f1' };
+
+    const Graph = ForceGraph3D()(document.getElementById('3d-graph'))
+      .graphData(data)
+      .nodeColor(n => colors[n.group] || '#64748b')
+      .nodeLabel(node => "[" + node.group + "] " + node.name)
+      .linkDirectionalArrowLength(4)
+      .linkDirectionalArrowRelPos(1)
+      .linkCurvature(0.2)
+      .linkLabel(link => link.label);
+  </script>
+</body>
+</html>

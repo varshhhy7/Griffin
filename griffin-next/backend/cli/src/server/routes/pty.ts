@@ -151,8 +151,15 @@ export const PtyRoutes = lazy(() =>
       validator("param", z.object({ ptyID: z.string() })),
       upgradeWebSocket((c) => {
         const id = c.req.param("ptyID")
+        const existing = Pty.get(id)
+        if (!existing) {
+          return {
+            onOpen(_event, ws) {
+              ws.close(1008, "PTY session not found")
+            },
+          }
+        }
         let handler: ReturnType<typeof Pty.connect>
-        if (!Pty.get(id)) throw new Error("Session not found")
         return {
           onOpen(_event, ws) {
             handler = Pty.connect(id, ws)

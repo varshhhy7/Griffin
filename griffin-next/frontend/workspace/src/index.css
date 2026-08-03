@@ -40,9 +40,9 @@
   notes, markdown). Airy measure and calm rhythm, paper-like.
 */
 .prose-editorial {
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-large, 15px);
-  line-height: 1.7;
+  font-family: var(--font-prose);
+  font-size: var(--text-prose, 15px);
+  line-height: 1.6;
   color: var(--text-base, var(--color-text));
   max-width: 68ch;
 }

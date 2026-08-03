@@ -9,6 +9,7 @@ import { runtimeRegexPass, classifierInjectionRegexPass } from "./install/review
 import { NamedError } from "@griffin/util/error"
 import { ConfigMarkdown } from "../config/markdown"
 import INITIALIZE_ATLAS_GRAPH_MD from "./system/initialize-atlas-graph.txt"
+import THINK_ON_GRAPH_MD from "./system/think-on-graph.txt"
 import { Log } from "../util/log"
 import { Global } from "@/global"
 import { Filesystem } from "@/util/filesystem"
@@ -26,6 +27,11 @@ import { Installation } from "@/installation"
 // the API index. Kept in sync with skills/research/<name>/SKILL.md by a test.
 const SYSTEM_SKILLS: Array<{ name: string; content: string }> = [
   { name: "initialize-atlas-graph", content: INITIALIZE_ATLAS_GRAPH_MD },
+  // Embedded for the same reason: the knowledge-graph tools ship in the binary,
+  // so the skill that explains how to drive them has to as well. Loaded from
+  // the filesystem it works in `bun run dev` and silently vanishes in a real
+  // install.
+  { name: "think-on-graph", content: THINK_ON_GRAPH_MD },
 ]
 
 export namespace Skill {

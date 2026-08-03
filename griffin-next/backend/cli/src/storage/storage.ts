@@ -8,6 +8,9 @@ import { Lock } from "../util/lock"
 import { $ } from "bun"
 import { NamedError } from "@griffin/util/error"
 import z from "zod"
+import { DatabaseMode } from "./db/mode"
+import { Projection } from "./db/projection"
+import { Readiness } from "./db/readiness"
 
 export namespace Storage {
   const log = Log.create({ service: "storage" })
@@ -163,6 +166,7 @@ export namespace Storage {
     const target = path.join(dir, ...key) + ".json"
     return withErrorHandling(async () => {
       await fs.unlink(target).catch(() => {})
+      await Projection.remove(key)
     })
   }
 
@@ -170,6 +174,7 @@ export namespace Storage {
     const dir = await state().then((x) => x.dir)
     const target = path.join(dir, ...key) + ".json"
     return withErrorHandling(async () => {
+      if (DatabaseMode.primary()) return readPrimary<T>(key, target)
       using _ = await Lock.read(target)
       const result = await Bun.file(target).json()
       return result as T
@@ -181,11 +186,29 @@ export namespace Storage {
     const target = path.join(dir, ...key) + ".json"
     return withErrorHandling(async () => {
       using _ = await Lock.write(target)
-      const content = await Bun.file(target).json()
+      // Read from whichever store is authoritative. Reading JSON here while
+      // `read` reads SQL would make a record present in the database but absent
+      // on disk readable and un-updatable. That is invisible today only because
+      // `primary` still writes JSON as a rollback — it would surface the moment
+      // the JSON writer is removed, which is the one irreversible step.
+      const content = DatabaseMode.primary() ? await readPrimary<T>(key, target) : await Bun.file(target).json()
       fn(content)
       await Bun.write(target, JSON.stringify(content, null, 2))
+      await Projection.write(key, content)
       return content as T
     })
+  }
+
+  /** SQL-backed read that preserves `NotFoundError` and its exact message. */
+  async function readPrimary<T>(key: string[], target: string): Promise<T> {
+    // Refuse to serve reads from an incompletely backfilled database. Without
+    // this, missing rows present as absent records rather than as an error.
+    await Readiness.assertReady()
+    const value = await Projection.read<T>(key)
+    // The message names the JSON path even though no file was consulted:
+    // ~15 call sites match on this error, and several log it.
+    if (value === undefined) throw new NotFoundError({ message: `Resource not found: ${target}` })
+    return value
   }
 
   export async function write<T>(key: string[], content: T) {
@@ -194,6 +217,7 @@ export namespace Storage {
     return withErrorHandling(async () => {
       using _ = await Lock.write(target)
       await Bun.write(target, JSON.stringify(content, null, 2))
+      await Projection.write(key, content)
     })
   }
 
@@ -210,6 +234,14 @@ export namespace Storage {
 
   const glob = new Bun.Glob("**/*")
   export async function list(prefix: string[]) {
+    if (DatabaseMode.primary()) {
+      // The most dangerous path: an unprojected namespace makes this return a
+      // shorter list, which reads as "those records were deleted".
+      await Readiness.assertReady()
+      const keys = await Projection.list(prefix)
+      keys.sort()
+      return keys
+    }
     const dir = await state().then((x) => x.dir)
     try {
       const result = await Array.fromAsync(

@@ -26,10 +26,27 @@ env/
 .uv-cache/
 .python-version
 
-# Local Griffin runtime state
+# Local Griffin runtime state & debug logs
 .griffin/
 runs/
 *.log
+out.txt
+headers.txt
+griffin-next/out.txt
+griffin-next/headers.txt
+
+# Databases and SQLite local state
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Obsidian Knowledge Graph local vault and workspace state
+obsidian_kg/
+griffin-next/obsidian_kg/
+.obsidian/
 
 # Secrets and local configuration
 .env

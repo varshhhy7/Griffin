@@ -85,22 +85,26 @@
 
   --text-2xs: 9px;
   --text-xs: 10px;
-  --text-sm: 11px;
-  --text-base: 12px;
-  --text-md: 13px;
-  --text-lg: 14px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
   --text-xl: 16px;
   --text-2xl: 20px;
+  --text-prose: 15px;
 
-  --font-sans: "Computer Modern", "Latin Modern Roman", Georgia, "Times New Roman", serif;
-  --font-serif: "Computer Modern", "Latin Modern Roman", Georgia, "Times New Roman", serif;
-  /* Code font: single source. --font-family-mono is owned by @griffin/ui theme.css
-     and written at runtime by the Settings mono-font picker (self-hosted Nerd
-     Font families) — everything code-shaped routes through it. */
+  /* Role-named typography tokens — ui for interface chrome, prose for latex/transcript content */
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-prose: "Computer Modern", "Latin Modern Roman", Georgia, serif;
+  /* Code font: single source. --font-family-mono is owned by @griffin/ui theme.css */
   --font-code: var(--font-family-mono);
-  --font-ui-sans: "Computer Modern", "Latin Modern Roman", Georgia, "Times New Roman", serif;
-  /* Bridge @griffin/ui (SessionTurn chat transcript) typography to Computer Modern */
-  --font-family-sans: "Computer Modern", "Latin Modern Roman", Georgia, serif;
+
+  /* Legacy & bridge aliases route to the correct role token */
+  --font-sans: var(--font-ui);
+  --font-ui-sans: var(--font-ui);
+  --font-family-sans: var(--font-ui);
+  --font-serif: var(--font-prose);
+  --font-family-serif: var(--font-prose);
 
   --z-header: 20;
   --z-sticky: 50;
@@ -1145,4 +1149,13 @@ html[data-color-scheme="dark"] .atlas-overlay {
   right: 6px;
   border-bottom: 1px solid;
   border-right: 1px solid;
+}
+
+/* Digits tabular alignment — prevent layout jitter on counters/timestamps/node metrics */
+.metric,
+.count,
+.timestamp,
+.tabular-nums,
+[data-slot="metric"] {
+  font-variant-numeric: tabular-nums;
 }

@@ -1242,6 +1242,12 @@ export namespace Config {
             .positive()
             .optional()
             .describe("Timeout in milliseconds for model context protocol (MCP) requests"),
+          db: z
+            .enum(["off", "shadow", "primary"])
+            .optional()
+            .describe(
+              "SQLite datastore rollout mode. 'off' (default) is JSON only; 'shadow' also projects into SQLite but still reads JSON; 'primary' reads and writes SQLite with JSON kept as a rollback. Override per-process with GRIFFIN_DB.",
+            ),
         })
         .optional(),
     })

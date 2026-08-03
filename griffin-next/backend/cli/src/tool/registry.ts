@@ -35,6 +35,9 @@ import { ScienceTools } from "./science"
 import { ProvenanceTools } from "./provenance"
 import { NotebookTool } from "./notebook"
 import { RKernelTool } from "./rkernel"
+import { GraphTools } from "./graph"
+import { KbTools } from "./kb"
+import { DatabaseMode } from "@/storage/db/mode"
 
 export namespace ToolRegistry {
   const log = Log.create({ service: "tool.registry" })
@@ -131,6 +134,11 @@ export namespace ToolRegistry {
       ...BiologyTools,
       ...ScienceTools,
       ...ProvenanceTools,
+      // Graph and KB tools read the SQLite datastore, so they only exist when
+      // it does. Registering them under `experimental.db=off` would hand the
+      // model tools that open a database the user opted out of — and would
+      // break acceptance criterion 2 (off restores current behavior exactly).
+      ...(DatabaseMode.enabled() ? [...GraphTools, ...KbTools] : []),
       NotebookTool,
       RKernelTool,
       ArtifactTool,

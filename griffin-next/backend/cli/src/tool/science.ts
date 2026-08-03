@@ -1,6 +1,7 @@
 import z from "zod"
 import { Tool } from "./tool"
 import { registry } from "../science/connectors"
+import { Ingest } from "../storage/db/graph/ingest"
 import type { ConnectorHit } from "../science/connectors"
 
 /**
@@ -132,10 +133,31 @@ export const ScienceSearchTool = Tool.define("science_search", {
       return lines.join("\n")
     })
 
+    // Record what the authority returned into the knowledge base.
+    //
+    // These accessions are already resolved — they came back from the source
+    // database, not from the model — so this is the cheapest honest way to
+    // give the KB density. Never allowed to fail the search itself.
+    const ingested = Ingest.recordSafely({
+      connectorId: connector.id,
+      domain: connector.domain,
+      hits,
+      query: params.query,
+      messageId: ctx.messageID,
+      sessionId: ctx.sessionID,
+    })
+
     return {
       title: `${connector.name}: ${params.query}`,
       output: [`**${connector.name}** — ${hits.length} result(s):`, "", rows.join("\n\n---\n\n")].join("\n"),
-      metadata: { db: connector.id, count: hits.length } as Record<string, unknown>,
+      metadata: {
+        db: connector.id,
+        count: hits.length,
+        // Persisted so `db rebuild` can re-derive these nodes from the stored
+        // part rather than needing the network again.
+        accessions: hits.map((h) => h.id).filter(Boolean),
+        kb_nodes: ingested.nodeIds,
+      } as Record<string, unknown>,
     }
   },
 })

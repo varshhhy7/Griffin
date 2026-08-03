@@ -8,7 +8,7 @@ const AGENT_KEY = "thesis-agent-v1"
 
 // User-selectable agents. A previously-persisted agent that no longer exists (e.g. a
 // removed mode) falls back to the default rather than sending an invalid agent.
-const VALID_AGENTS = new Set(["research", "biology", "plan"])
+const VALID_AGENTS = new Set(["auto", "research", "biology", "plan", "dataset-builder"])
 
 function readAgent(): string {
   try {

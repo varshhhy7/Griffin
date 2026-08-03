@@ -49,3 +49,12 @@ Environment options:
 ## Deployment
 
 You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+
+## Typography & Design System Architecture
+
+Griffin Workspace uses a role-based typography system:
+
+- **UI Chrome (`--font-ui` / `FONT_UI`):** `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`. Used for all buttons, menus, file tree, command palette, status bar, and UI controls with full 4-step font-weight support (400, 500, 600, 700).
+- **Prose & Transcript (`--font-prose` / `FONT_PROSE`):** `"Computer Modern", "Latin Modern Roman", Georgia, serif`. Used for long-form research text, session transcripts, and rendered markdown documents at 15px with 1.6 line-height.
+- **Code (`--font-code` / `FONT_CODE`):** Monospace font stack (`var(--font-family-mono)`) for code blocks, accessions, node IDs, and diffs.
+- **Tabular Numerals (`font-variant-numeric: tabular-nums`):** Applied via `.metric`, `.count`, `.timestamp`, and `.tabular-nums` utility classes to prevent layout jitter on numeric value updates.

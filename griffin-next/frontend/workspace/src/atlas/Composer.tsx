@@ -127,7 +127,7 @@ function formatTokens(value: number | undefined): string {
 }
 
 // Griffin exposes a focused life-science research team.
-type AgentName = "research" | "biology" | "plan"
+type AgentName = "auto" | "research" | "biology" | "plan" | "dataset-builder"
 
 interface AgentOption {
   name: AgentName
@@ -136,8 +136,10 @@ interface AgentOption {
 }
 
 const AGENT_OPTIONS: AgentOption[] = [
+  { name: "auto", label: "auto", hint: "admin · unrestricted · all specialists" },
   { name: "research", label: "research", hint: "default · literature + analysis" },
   { name: "biology", label: "biology specialist", hint: "bioinformatics + life-science data" },
+  { name: "dataset-builder", label: "dataset builder", hint: "paper collection + full-text downloads" },
   { name: "plan", label: "plan", hint: "think first, no edits" },
 ]
 

@@ -74,6 +74,26 @@ Keep only one item in_progress at a time.
     ]
   }
 
+  export async function databaseModeInstructions(): Promise<string[]> {
+    const { DatabaseMode } = await import("../storage/db/mode")
+    if (!DatabaseMode.enabled()) return []
+    return [
+      `<knowledge-graph-mode>
+The local knowledge graph is active (mode: ${DatabaseMode.get()}).
+
+For a single lookup use \`graph_search\` (nodes plus full-text over past message content) or \`graph_neighbors\` (one hop).
+
+For a question needing more than one hop, use the think-on-graph skill: \`graph_link\` to find starting entities, then \`graph_explore_relations\` -> prune -> \`graph_expand\`, repeating, then \`graph_evidence\` to cite. You do the pruning; following every relation just returns noise. \`graph_reason\` runs the same loop in one call at the cost of extra model calls per hop.
+
+Record what you learn with \`kb_entity\` (accessions are verified against the source database) and \`kb_assert\` (requires a source and a confidence). Both land unreviewed until audited, so when you cite graph results, distinguish observed facts from agent assertions.
+
+Every \`science_search\` hit is recorded into the graph automatically — you do not need to do anything for that.
+
+The Obsidian vault is NOT synced automatically. \`griffin db export-obsidian\` writes it, and \`griffin db rebuild\` refreshes it if it already exists. Only mention it if the user asks to see the graph.
+</knowledge-graph-mode>`,
+    ]
+  }
+
   export async function environment(model: Provider.Model) {
     const project = Instance.project
     return [

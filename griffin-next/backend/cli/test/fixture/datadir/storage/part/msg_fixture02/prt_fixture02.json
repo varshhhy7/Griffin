@@ -1,0 +1,1 @@
+{"id":"prt_fixture02","sessionID":"ses_fixture01","messageID":"msg_fixture02","type":"tool","callID":"call_1","tool":"read","state":{"status":"completed","input":{"filePath":"/fixture/repo/counts.tsv"},"output":"ok","title":"read","metadata":{},"time":{"start":1700000011000,"end":1700000012000}}}

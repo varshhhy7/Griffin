@@ -864,6 +864,7 @@ export namespace SessionPrompt {
         ...(await InstructionPrompt.system()),
         ...(await Memory.recall(memoryQuery)),
         ...artifactContext,
+        ...(await SystemPrompt.databaseModeInstructions()),
       ]
 
       // P0.1 telemetry: record what the working context is made of, by content type,

@@ -22,8 +22,9 @@ import { registrations as molecular } from "./molecular"
 import { registrations as genomics } from "./genomics"
 import { registrations as documents } from "./documents"
 import { registrations as media } from "./media"
+import { registrations as graph } from "./graph"
 
-for (const r of [...molecular, ...genomics, ...documents, ...media]) {
+for (const r of [...molecular, ...genomics, ...documents, ...media, ...graph]) {
   register(r.kind, r.component)
 }
 // ────────────────────────────────────────────────────────────────────────────

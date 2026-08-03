@@ -1,13 +1,13 @@
 :root {
-  /* Computer Modern (Latin Modern Roman) is the single UI typeface across the
-     whole product — sans AND serif resolve to it so nothing in the shared UI
-     drifts to a different family. Keep this in lockstep with FONT_SANS/SERIF in
-     frontend/workspace/src/styles/tokens.ts. NEVER swap the family; only sizes change. */
-  --font-family-sans: "Computer Modern", "Latin Modern Roman", Georgia, "Times New Roman", serif;
+  /* Role-based font variables: system UI stack for chrome, Computer Modern for prose */
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-prose: "Computer Modern", "Latin Modern Roman", Georgia, "Times New Roman", serif;
+
+  --font-family-sans: var(--font-ui);
   --font-family-sans--font-feature-settings: normal;
   --font-family-mono: "IBM Plex Mono", "IBM Plex Mono Fallback";
   --font-family-mono--font-feature-settings: "ss01" 1;
-  --font-family-serif: "Computer Modern", "Latin Modern Roman", Georgia, "Times New Roman", serif;
+  --font-family-serif: var(--font-prose);
   --font-family-serif--font-feature-settings: normal;
 
   --font-size-2x-small: 10px;

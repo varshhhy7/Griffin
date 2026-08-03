@@ -101,21 +101,23 @@ export default function Home(): JSX.Element {
     const hide = projectPrefs.hidden()
     const byWorktree = new Map<string, (typeof sync.data.project)[number]>()
     for (const p of sync.data.project) {
-      if (!p.worktree || hide.has(p.worktree)) continue
+      if (!p || !p.worktree || hide.has(p.worktree)) continue
       const existing = byWorktree.get(p.worktree)
       if (!existing) {
         byWorktree.set(p.worktree, p)
         continue
       }
-      const cur = p.time.updated ?? p.time.created ?? 0
-      const old = existing.time.updated ?? existing.time.created ?? 0
+      const cur = p.time?.updated ?? p.time?.created ?? 0
+      const old = existing.time?.updated ?? existing.time?.created ?? 0
       if (cur > old) byWorktree.set(p.worktree, p)
     }
     return Array.from(byWorktree.values()).sort((a, b) => {
       const af = fav.has(a.worktree) ? 1 : 0
       const bf = fav.has(b.worktree) ? 1 : 0
       if (af !== bf) return bf - af
-      return (b.time.updated ?? b.time.created) - (a.time.updated ?? a.time.created)
+      const at = a.time?.updated ?? a.time?.created ?? 0
+      const bt = b.time?.updated ?? b.time?.created ?? 0
+      return bt - at
     })
   })
 
@@ -365,7 +367,7 @@ export default function Home(): JSX.Element {
                       <ProjectRow
                         worktree={p.worktree}
                         homedir={homedir()}
-                        updatedAt={p.time.updated ?? p.time.created}
+                        updatedAt={p.time?.updated ?? p.time?.created ?? Date.now()}
                         last={i() === filtered().length - 1}
                         isFavorite={projectPrefs.isFavorite(p.worktree)}
                         onOpen={() => openProject(p.worktree)}
@@ -395,7 +397,7 @@ export default function Home(): JSX.Element {
                     <ProjectCard
                       worktree={p.worktree}
                       homedir={homedir()}
-                      updatedAt={p.time.updated ?? p.time.created}
+                      updatedAt={p.time?.updated ?? p.time?.created ?? Date.now()}
                       isFavorite={projectPrefs.isFavorite(p.worktree)}
                       onOpen={() => openProject(p.worktree)}
                       onToggleFavorite={() => {

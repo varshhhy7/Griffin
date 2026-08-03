@@ -17,15 +17,16 @@ export async function assertExternalDirectory(ctx: Tool.Context, target?: string
   if (Instance.containsPath(target)) return
 
   const kind = options?.kind ?? "file"
-  const parentDir = kind === "directory" ? target : path.dirname(target)
-  const glob = path.join(parentDir, "*")
+  const normalizedTarget = target.replace(/\\/g, "/")
+  const parentDir = (kind === "directory" ? normalizedTarget : path.dirname(normalizedTarget)).replace(/\\/g, "/")
+  const glob = (parentDir.endsWith("/") ? parentDir + "*" : parentDir + "/*")
 
   await ctx.ask({
     permission: "external_directory",
     patterns: [glob],
     always: [glob],
     metadata: {
-      filepath: target,
+      filepath: normalizedTarget,
       parentDir,
     },
   })

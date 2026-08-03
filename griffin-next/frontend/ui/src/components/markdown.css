@@ -4,9 +4,9 @@
   max-width: 100%;
   overflow-wrap: break-word;
   color: var(--text-base);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-base); /* 14px */
-  line-height: var(--line-height-x-large);
+  font-family: var(--font-prose, var(--font-family-serif));
+  font-size: var(--text-prose, 15px);
+  line-height: 1.6;
 
   /* Spacing for flow */
   > *:first-child {

@@ -18,6 +18,7 @@ type Usage = {
   pointer: string | null
   total_bytes: number
   entries: Entry[]
+  db_mode?: "off" | "shadow" | "primary"
 }
 
 function fmt(bytes: number): string {
@@ -54,6 +55,47 @@ export const Storage: Component = () => {
     }
   }
   onMount(() => void load())
+
+  const syncObsidian = async () => {
+    if (busy()) return
+    setBusy(true)
+    setError(undefined)
+    setStatus(undefined)
+    try {
+      const res = await settingsApi<{ ok: boolean; exportedNodes: number; exportedEdges: number; targetDir: string }>(
+        base(),
+        fetchFn(),
+        "/settings/storage/obsidian-sync",
+        { method: "POST" },
+      )
+      setStatus(`Exported ${res.exportedNodes} nodes to Obsidian vault at ${res.targetDir}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const setDbMode = async (mode: "off" | "shadow" | "primary") => {
+    if (busy()) return
+    setBusy(true)
+    setError(undefined)
+    setStatus(undefined)
+    try {
+      await settingsApi(
+        base(),
+        fetchFn(),
+        "/settings/storage/db-mode",
+        { method: "POST", body: JSON.stringify({ mode }) },
+      )
+      setStatus(`Knowledge Graph mode updated to '${mode}'. Restart Griffin to apply changes to active sessions.`)
+      await load()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const relocate = async () => {
     if (busy()) return
@@ -120,6 +162,67 @@ export const Storage: Component = () => {
         <Show when={status()}>
           <div style={bannerStyle("var(--color-success)", "var(--color-success-muted)")}>{status()}</div>
         </Show>
+
+        {/* Knowledge Graph (SQLite) */}
+        <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-1">
+            <h3 class="text-13-medium text-text-weak tracking-wide">Knowledge Graph (SQLite)</h3>
+            <p class="text-12-regular text-text-weak">
+              Stores sessions, entity resolution, and literature lineage in a local SQLite graph for Think-on-Graph queries.
+            </p>
+          </div>
+          <div style={{ border: "1px solid var(--color-border)", "border-radius": "4px", padding: "16px 18px" }}>
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-1">
+                <span class="text-13-regular text-text-strong">
+                  Current Mode: <strong style={{ color: "var(--color-text-interactive-base, #3b82f6)" }}>{usage()?.db_mode ?? "off"}</strong>
+                </span>
+                <span class="text-12-regular text-text-weak">
+                  {usage()?.db_mode === "primary"
+                    ? "Primary mode — SQLite is the active primary datastore."
+                    : usage()?.db_mode === "shadow"
+                      ? "Shadow mode — SQLite populates in parallel with JSON storage. (Recommended)"
+                      : "Off — Pure JSON storage only. Graph database is disabled."}
+                </span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  size="small"
+                  variant={usage()?.db_mode === "off" || !usage()?.db_mode ? "primary" : "secondary"}
+                  disabled={busy()}
+                  onClick={() => void setDbMode("off")}
+                >
+                  Off
+                </Button>
+                <Button
+                  size="small"
+                  variant={usage()?.db_mode === "shadow" ? "primary" : "secondary"}
+                  disabled={busy()}
+                  onClick={() => void setDbMode("shadow")}
+                >
+                  Shadow Mode
+                </Button>
+                <Button
+                  size="small"
+                  variant={usage()?.db_mode === "primary" ? "primary" : "secondary"}
+                  disabled={busy()}
+                  onClick={() => void setDbMode("primary")}
+                >
+                  Primary Mode
+                </Button>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border-weak-base">
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-13-regular text-text-strong">Obsidian Vault Sync</span>
+                  <span class="text-12-regular text-text-weak">Export markdown notes & [[wikilinks]] for Obsidian Graph View</span>
+                </div>
+                <Button size="small" variant="secondary" disabled={busy()} onClick={() => void syncObsidian()}>
+                  {busy() ? "Syncing…" : "Sync to Obsidian Vault"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Data location */}
         <div class="flex flex-col gap-3">

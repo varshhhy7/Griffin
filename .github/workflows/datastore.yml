@@ -1,0 +1,78 @@
+name: datastore
+
+# Gate for the SQLite datastore + knowledge graph workstream.
+# See griffin-next/docs/plans/12-sqlite-knowledge-graph.md.
+#
+# Deliberately scoped rather than running the whole test suite: the CLI suite
+# has pre-existing failures unrelated to this work (Windows path/symlink/unicode
+# cases in patch, snapshot, file/ignore, project worktrees, atlas-bridge and
+# compaction). Gating on `bun test` wholesale would be red on arrival and
+# therefore ignored. Widen this once that backlog is cleared.
+
+on:
+  push:
+    paths:
+      - "griffin-next/backend/cli/src/storage/**"
+      - "griffin-next/backend/cli/test/storage/**"
+      - "griffin-next/backend/cli/src/cli/cmd/db.ts"
+      - "griffin-next/backend/cli/src/tool/graph.ts"
+      - "griffin-next/backend/cli/src/tool/kb.ts"
+      - "schemas/griffin-db.sql"
+      - "griffin/storage/**"
+      - "tests/test_schema_contract.py"
+      - ".github/workflows/datastore.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  typescript:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: griffin-next/backend/cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - name: Install
+        run: bun install
+        working-directory: griffin-next
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      # Includes the schema-snapshot test, which fails if schemas/griffin-db.sql
+      # has drifted from the migrations — that snapshot is what the Python
+      # contract test builds its fixture from.
+      - name: Datastore tests
+        run: bun test test/storage/
+
+      # The fixture gate. This is the only mechanism that catches a new Storage
+      # write path silently skipping projection, which is the most likely way
+      # shadow mode rots. A failure here is a real defect, not a stale fixture.
+      - name: Backfill fixture data dir
+        run: bun run --conditions=browser ./src/index.ts db backfill --data-dir test/fixture/datadir --format json
+
+      - name: Verify zero drift
+        run: bun run --conditions=browser ./src/index.ts db verify --data-dir test/fixture/datadir --format json
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -e .
+
+      # Builds its fixture from schemas/griffin-db.sql, so a backend schema
+      # change that breaks the Python read contract fails here.
+      - name: Schema contract
+        run: python -m pytest tests/test_schema_contract.py -q

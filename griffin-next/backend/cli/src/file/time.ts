@@ -21,15 +21,22 @@ export namespace FileTime {
     }
   })
 
+  function normalizeKey(file: string): string {
+    const p = file.replace(/\\/g, "/")
+    return process.platform === "win32" ? p.toLowerCase() : p
+  }
+
   export function read(sessionID: string, file: string) {
     log.info("read", { sessionID, file })
+    const key = normalizeKey(file)
     const { read } = state()
     read[sessionID] = read[sessionID] || {}
-    read[sessionID][file] = new Date()
+    read[sessionID][key] = new Date()
   }
 
   export function get(sessionID: string, file: string) {
-    return state().read[sessionID]?.[file]
+    const key = normalizeKey(file)
+    return state().read[sessionID]?.[key]
   }
 
   export async function withLock<T>(filepath: string, fn: () => Promise<T>): Promise<T> {

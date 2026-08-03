@@ -16,6 +16,8 @@ import PROMPT_LITERATURE_REVIEW from "./prompt/literature-review.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
 import PROMPT_PHYSICS_CRITIQUE from "./prompt/physics-critique.txt"
 import PROMPT_REVIEWER from "./prompt/reviewer.txt"
+import PROMPT_DATASET_BUILDER from "./prompt/dataset-builder.txt"
+import PROMPT_AUTO from "./prompt/auto.txt"
 import { PermissionNext } from "@/permission/next"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
 import { Global } from "@/global"
@@ -54,28 +56,51 @@ export namespace Agent {
 
     const defaults = PermissionNext.fromConfig({
       "*": "allow",
-      mcp: "ask",
-      doom_loop: "ask",
-      external_directory: {
-        "*": "ask",
-        [Truncate.DIR]: "allow",
-        [Truncate.GLOB]: "allow",
-      },
-      question: "deny",
+      mcp: "allow",
+      doom_loop: "allow",
+      external_directory: "allow",
+      question: "allow",
       plan_enter: "deny",
       plan_exit: "deny",
-      // mirrors github.com/github/gitignore Node.gitignore pattern for .env files
-      read: {
-        "*": "allow",
-        "*.env": "ask",
-        "*.env.*": "ask",
-        "*.env.example": "allow",
-      },
+      read: "allow",
+      edit: "allow",
+      write: "allow",
+      bash: "allow",
+      skill: "allow",
+      webfetch: "allow",
+      websearch: "allow",
     })
     const user = PermissionNext.fromConfig(cfg.permission ?? {})
 
     const result: Record<string, Info> = {
-      // --- Research modes (top) ---
+      // --- Admin / unrestricted ---
+      auto: {
+        name: "auto",
+        description:
+          "Unrestricted admin agent — full tool access, no permission gates, can orchestrate any specialist workflow inline.",
+        options: {},
+        color: "#ef4444",
+        permission: PermissionNext.fromConfig({
+          "*": "allow",
+          mcp: "allow",
+          doom_loop: "allow",
+          external_directory: "allow",
+          question: "allow",
+          plan_enter: "deny",
+          plan_exit: "deny",
+          read: "allow",
+          edit: "allow",
+          write: "allow",
+          bash: "allow",
+          skill: "allow",
+          webfetch: "allow",
+          websearch: "allow",
+        }),
+        prompt: PROMPT_AUTO,
+        mode: "all",
+        native: true,
+      },
+      // --- Research modes ---
       research: {
         name: "research",
         description:
@@ -107,6 +132,24 @@ export namespace Agent {
           }),
           user,
         ),
+        mode: "all",
+        native: true,
+      },
+      "dataset-builder": {
+        name: "dataset-builder",
+        description:
+          "Pure paper collection & dataset builder specialist — downloads open-access research papers, abstracts, and metadata into session dataset folders.",
+        options: {},
+        color: "#3b82f6",
+        permission: PermissionNext.merge(
+          defaults,
+          PermissionNext.fromConfig({
+            question: "allow",
+            plan_enter: "deny",
+          }),
+          user,
+        ),
+        prompt: PROMPT_DATASET_BUILDER,
         mode: "all",
         native: true,
       },
@@ -384,20 +427,19 @@ export namespace Agent {
       item.permission = PermissionNext.merge(item.permission, PermissionNext.fromConfig(value.permission ?? {}))
     }
 
-    // Ensure Truncate.DIR is allowed unless explicitly configured
+    // Ensure wildcard external_directory is allowed unless explicitly denied
     for (const name in result) {
       const agent = result[name]
-      const explicit = agent.permission.some((r) => {
+      const explicitlyDenied = agent.permission.some((r) => {
         if (r.permission !== "external_directory") return false
-        if (r.action !== "deny") return false
-        return r.pattern === Truncate.DIR || r.pattern === Truncate.GLOB
+        return r.action === "deny"
       })
-      if (explicit) continue
-
-      result[name].permission = PermissionNext.merge(
-        result[name].permission,
-        PermissionNext.fromConfig({ external_directory: { [Truncate.DIR]: "allow", [Truncate.GLOB]: "allow" } }),
-      )
+      if (!explicitlyDenied) {
+        agent.permission = PermissionNext.merge(
+          agent.permission,
+          PermissionNext.fromConfig({ external_directory: { "*": "allow" } }),
+        )
+      }
     }
 
     return result

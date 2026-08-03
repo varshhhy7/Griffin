@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "workspace",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--cwd", "griffin-next/frontend/workspace", "dev"],
+      "port": 3000
+    }
+  ]
+}

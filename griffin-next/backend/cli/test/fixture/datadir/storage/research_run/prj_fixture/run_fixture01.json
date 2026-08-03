@@ -1,0 +1,1 @@
+{"id":"run_fixture01","projectID":"prj_fixture","sessionID":"ses_fixture01","workflow":{"id":"rna-seq","version":"1.0.0","name":"RNA-seq"},"status":"completed","progress":{"current":3,"total":3,"step":"done"},"inputs":[],"parameters":{},"plan":[],"checks":[],"logs":[],"outputs":[],"warnings":[],"approvals":[],"time":{"created":1700000000000,"updated":1700000200000}}
