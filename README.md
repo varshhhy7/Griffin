@@ -114,6 +114,10 @@ griffin-next/backend/    Server, agent runtime, connectors, and scientific runs
 griffin-next/frontend/   Research workspace UI and shared components
 ```
 
+For contributor-oriented navigation, see [the repository map](docs/repository-map.md)
+and [the contributor guide](CONTRIBUTING.md). Each major area also has a small
+README that explains its ownership boundary.
+
 ## Quality Checks
 
 Run the checks appropriate to the component you change.
@@ -150,7 +154,8 @@ the current capability boundary.
 
 ## Contributing
 
-Contributions are welcome. Please keep changes focused, include tests for
+Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md) to
+choose the owning package and the smallest relevant check. Keep changes focused, include tests for
 behavioral changes, document scientific assumptions, and avoid claims beyond
 what the implementation and evidence support.
 

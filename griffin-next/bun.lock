@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@synsci/monorepo",
+      "name": "@griffin/monorepo",
       "dependencies": {
         "@griffin/plugin": "workspace:*",
         "@griffin/script": "workspace:*",

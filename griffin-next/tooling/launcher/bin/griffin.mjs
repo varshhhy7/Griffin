@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-if (process.env.__SYNSCI_LAUNCHER_PID) {
+if (process.env.__GRIFFIN_LAUNCHER_PID) {
   process.stderr.write(
-    `synsci: launcher invoked recursively (parent pid ${process.env.__SYNSCI_LAUNCHER_PID}). Exiting.\n`,
+    `griffin: launcher invoked recursively (parent pid ${process.env.__GRIFFIN_LAUNCHER_PID}). Exiting.\n`,
   )
   process.exit(2)
 }
-process.env.__SYNSCI_LAUNCHER_PID = String(process.pid)
+process.env.__GRIFFIN_LAUNCHER_PID = String(process.pid)
 
 import { execFileSync, execSync, spawn } from "node:child_process"
 import { existsSync, readFileSync, realpathSync } from "node:fs"
@@ -169,12 +169,9 @@ function hasDeprecatedCli() {
 function isConnected() {
   const xdgData = process.env.XDG_DATA_HOME || join(homedir(), ".local", "share")
   const sessionPath = join(xdgData, "griffin", "griffin-session.json")
-  const legacySessionPath = join(xdgData, "openscience", "openscience-session.json")
-  const pathToRead = existsSync(sessionPath) ? sessionPath : legacySessionPath
-  
-  if (!existsSync(pathToRead)) return false
+  if (!existsSync(sessionPath)) return false
   try {
-    const data = JSON.parse(readFileSync(pathToRead, "utf-8"))
+    const data = JSON.parse(readFileSync(sessionPath, "utf-8"))
     if (!data.access_token || !data.expires_at) return false
     return new Date(data.expires_at) > new Date()
   } catch {

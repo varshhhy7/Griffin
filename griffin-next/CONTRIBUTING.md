@@ -1,5 +1,9 @@
 # Contributing to Griffin
 
+This guide covers workspace-specific conventions. For the whole monorepo,
+start with [`../CONTRIBUTING.md`](../CONTRIBUTING.md) and the [repository
+map](../docs/repository-map.md).
+
 Thanks for your interest in contributing. These changes are the most likely to be merged:
 
 - Bug fixes

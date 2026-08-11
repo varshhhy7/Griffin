@@ -3,17 +3,62 @@ __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+.hypothesis/
 .ruff_cache/
 .mypy_cache/
+.pyre/
+.pyright/
+.pytype/
 .coverage
+.coverage.*
 coverage.xml
 htmlcov/
+.tox/
+.nox/
+pip-wheel-metadata/
 
 # Packaging and build outputs
 *.egg-info/
 build/
 dist/
 site/
+__pypackages__/
+*.whl
+
+# Bun, Node, and frontend tool output
+node_modules/
+.pnp/
+.pnp.*
+.npm/
+.yarn/*
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/sdks/
+!.yarn/versions/
+.parcel-cache/
+.vite/
+.vitest/
+.turbo/
+.next/
+.nuxt/
+.svelte-kit/
+.angular/
+.cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+bun-debug.log*
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+*.lcov
+*.tgz
 
 # Virtual environments and uv local state
 .venv/
@@ -29,6 +74,9 @@ env/
 # Local Griffin runtime state & debug logs
 .griffin/
 runs/
+logs/
+*.pid
+*.pid.lock
 *.log
 out.txt
 headers.txt
@@ -52,10 +100,22 @@ griffin-next/obsidian_kg/
 .env
 .env.*
 !.env.example
+!.env.*.example
+.envrc
+.secrets/
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Private or large biological data
 # Keep small synthetic fixtures under data/examples/ tracked.
 data/private/
+data/cache/
+data/downloads/
+data/interim/
+data/processed/
 *.vcf.gz
 *.bcf
 *.bam
@@ -82,12 +142,15 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+*.code-workspace
 *.swp
 *.swo
 
 # Temporary files
 *.tmp
 *.temp
+tmp/
+temp/
 ~$*
 
 # Local source snapshots and developer-specific configuration.
@@ -96,10 +159,8 @@ griffin.jsonc
 .tmp-runtime-smoke*/
 
 # Griffin workspace dependencies, generated assets, and local runtime state.
-griffin-next/node_modules/
 griffin-next/.griffin/
 griffin-next/.tmp/
-griffin-next/.turbo/
 griffin-next/griffin-dev*.log
 
 # Scientific Runs is source code, not the root-level generated runs directory.
